@@ -23,6 +23,16 @@
 
   <div class="solo-q" id="q">Press Start</div>
 
+  <!-- 🪜 Climbing Ladder -->
+  <div class="ladder">
+    <div class="ladder-sun">☀️</div>
+    <div class="ladder-cloud">☁️</div>
+    <div class="ladder-flag">🚩</div>
+    <div class="ladder-rails" id="rails"></div>
+    <div class="ladder-climber" id="climber">🧗</div>
+    <div class="ladder-level-text">Level <span id="lvlTxt">1</span> / 10</div>
+  </div>
+
   <div class="numpad" id="pad" style="margin-bottom:18px"></div>
 
   <div class="controls">
@@ -46,11 +56,32 @@
 let lvl=1,lives=3,score=0,cur=null,playing=false;
 const $=id=>document.getElementById(id);
 
+// Build ladder rungs once
+const MAX_LVL = 10;
+(function buildRungs(){
+  const rails = $('rails');
+  for(let i=0;i<MAX_LVL;i++){
+    const r = document.createElement('div');
+    r.className = 'ladder-rung';
+    r.style.bottom = (i*28 + 10) + 'px';
+    rails.appendChild(r);
+  }
+})();
+function moveClimber(){
+  const idx = Math.min(lvl-1, MAX_LVL-1);
+  $('climber').style.bottom = (idx*28 + 70) + 'px';
+  $('lvlTxt').textContent = lvl;
+  if(lvl>=MAX_LVL){ $('climber').textContent = '🏆'; }
+  else { $('climber').textContent = '🧗'; }
+}
+
 const pad = buildNumpad($('pad'), v=>{
   if(!playing||!cur) return;
   if(v===cur.ans){
     score += lvl*10;
-    lvl++; ok(); update(); next();
+    lvl++; ok(); update(); moveClimber();
+    if(lvl>MAX_LVL){ endWin(); return; }
+    next();
   } else {
     lives--; bad(); update();
     if(lives<=0) end();
@@ -65,6 +96,7 @@ function diffFor(l){
 function start(){
   lvl=1;lives=3;score=0;playing=true;
   update();
+  moveClimber();
   $('startBtn').textContent='Playing...';
   next();
 }
@@ -87,14 +119,27 @@ function end(){
   const name = $('pname').value || 'Player';
   lbAdd({game:'Mental Ladder', name, score, detail:`Level ${lvl}`});
 }
+function endWin(){
+  playing=false;
+  $('startBtn').textContent='▶ Start Climbing';
+  $('endTitle').textContent='🏆 Top of the Ladder!';
+  $('endScore').textContent = score;
+  $('endMsg').textContent = `Cleared all ${MAX_LVL} levels!`;
+  $('endC').classList.remove('hidden');
+  win();
+  const name = $('pname').value || 'Player';
+  lbAdd({game:'Mental Ladder', name, score, detail:`🏆 Cleared ${MAX_LVL} levels`});
+}
 function resetGame(){
   playing=false; cur=null;
   lvl=1;lives=3;score=0;
   update();
+  moveClimber();
   $('q').textContent='Press Start';
   pad.clear();
   $('startBtn').textContent='▶ Start Climbing';
   $('endC').classList.add('hidden');
 }
+moveClimber();
 </script>
 </body></html>

@@ -23,6 +23,16 @@
 
   <div class="solo-q" id="q">Press Start</div>
 
+  <!-- 🚀 Race Track -->
+  <div class="race-track">
+    <div class="race-lane"></div>
+    <div class="race-start"></div>
+    <div class="race-trail" id="trail"></div>
+    <div class="race-rocket" id="rocket">🚀</div>
+    <div class="race-finish"></div>
+    <div class="race-finish-flag">🏁</div>
+  </div>
+
   <div class="numpad" id="pad" style="margin-bottom:18px"></div>
 
   <div class="controls">
@@ -47,14 +57,27 @@ let cur=null,okC=0,koC=0,t=60,timer=null,playing=false;
 const $=id=>document.getElementById(id);
 const pad = buildNumpad($('pad'), v=>{
   if(!playing||!cur) return;
-  if(v===cur.ans){ okC++; $('ok').textContent=okC; ok(); next(); }
+  if(v===cur.ans){ okC++; $('ok').textContent=okC; ok(); moveRocket(); next(); }
   else { koC++; $('ko').textContent=koC; bad(); }
 });
+const TARGET = 30; // rocket reaches finish after 30 correct
+function moveRocket(){
+  const pct = Math.min(100, (okC/TARGET)*100);
+  $('rocket').style.left = pct + '%';
+  $('trail').style.width = pct + '%';
+  if(okC>=TARGET) $('rocket').textContent = '🏆';
+}
+function resetRocket(){
+  $('rocket').style.left = '0%';
+  $('rocket').textContent = '🚀';
+  $('trail').style.width = '0%';
+}
 
 function start(){
   okC=0;koC=0;t=60;playing=true;
   $('ok').textContent=0; $('ko').textContent=0; $('time').textContent=60;
   $('startBtn').textContent='Playing...';
+  resetRocket();
   next();
   timer = setInterval(()=>{
     t--; $('time').textContent=t;
@@ -83,6 +106,7 @@ function resetGame(){
   $('ok').textContent=0; $('ko').textContent=0; $('time').textContent=60;
   $('q').textContent='Press Start';
   pad.clear();
+  resetRocket();
   $('startBtn').textContent='▶ Start 60s Race';
   $('endC').classList.add('hidden');
 }

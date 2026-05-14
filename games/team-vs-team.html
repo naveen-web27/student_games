@@ -13,6 +13,18 @@
 
   <div class="big-q" id="q">Press Next ▶</div>
 
+  <!-- 🪢 Big Tug of War -->
+  <div class="tug" style="height:180px">
+    <div class="tug-center-line"></div>
+    <div class="tug-rope"></div>
+    <div class="tug-team-l" id="tugL" style="font-size:48px"><span>💪</span><span>🧒</span><span>🧒</span><span>🧑</span></div>
+    <div class="tug-team-r" id="tugR" style="font-size:48px"><span>🧑</span><span>🧒</span><span>🧒</span><span>💪</span></div>
+    <div class="tug-flag" id="tugFlag" style="font-size:60px">🚩</div>
+    <div class="tug-label-l" id="tugLabelL">Team A</div>
+    <div class="tug-label-r" id="tugLabelR">Team B</div>
+    <div class="tug-ground"></div>
+  </div>
+
   <div class="teams">
     <div class="team tA" id="teamA">
       <input class="name-edit" id="nA" value="Team A" maxlength="20">
@@ -81,6 +93,14 @@ function pt(team,delta){
   if(team==='A'){ sA=Math.max(0,sA+delta); $('sA').textContent=sA; flash('teamA'); }
   else         { sB=Math.max(0,sB+delta); $('sB').textContent=sB; flash('teamB'); }
   delta>0?ok():bad();
+  updateTug();
+}
+function updateTug(){
+  const diff = sA - sB;
+  const pct = Math.max(15, Math.min(85, 50 - diff*5));
+  $('tugFlag').style.left = pct + '%';
+  $('tugLabelL').textContent = ($('nA').value || 'Team A') + ' · ' + sA;
+  $('tugLabelR').textContent = ($('nB').value || 'Team B') + ' · ' + sB;
 }
 function flash(id){
   $(id).classList.add('active');
@@ -106,6 +126,9 @@ function resetAll(){
   $('q').textContent='Press Next ▶';
   $('answer').textContent='_';
   $('endC').classList.add('hidden');
+  $('tugFlag').style.left='50%';
+  updateTug();
 }
+updateTug();
 </script>
 </body></html>

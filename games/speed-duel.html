@@ -27,6 +27,18 @@
     <div class="info">First correct answer wins · Best of <span id="rounds">10</span> · Round <b id="round">0</b></div>
   </div>
 
+  <!-- 🪢 Tug of War -->
+  <div class="tug">
+    <div class="tug-center-line"></div>
+    <div class="tug-rope"></div>
+    <div class="tug-team-l" id="tugL"><span>💪</span><span>🧒</span><span>🧒</span></div>
+    <div class="tug-team-r" id="tugR"><span>🧒</span><span>🧒</span><span>💪</span></div>
+    <div class="tug-flag" id="tugFlag">🚩</div>
+    <div class="tug-label-l" id="tugLabelL">Player 1</div>
+    <div class="tug-label-r" id="tugLabelR">Player 2</div>
+    <div class="tug-ground"></div>
+  </div>
+
   <div class="duel-pads">
     <div class="numpad" id="pad1"></div>
     <div class="numpad" id="pad2"></div>
@@ -87,8 +99,17 @@ function handleAnswer(who, v){
     if(who===1){ s1++; $('s1').textContent=s1; }
     else { s2++; $('s2').textContent=s2; }
     ok(); flash(who);
-    setTimeout(next, 600);
+    updateTug();
+    setTimeout(next, 700);
   } else { bad(); }
+}
+function updateTug(){
+  // Flag moves: 50% center, P1 lead pulls LEFT (lower %), P2 lead pulls RIGHT
+  const diff = s1 - s2;
+  const pct = Math.max(15, Math.min(85, 50 - diff*6));
+  $('tugFlag').style.left = pct + '%';
+  $('tugLabelL').textContent = ($('n1').value || 'Player 1') + ' · ' + s1;
+  $('tugLabelR').textContent = ($('n2').value || 'Player 2') + ' · ' + s2;
 }
 function flash(who){
   const box = $('pBox'+who);
@@ -119,6 +140,9 @@ function resetGame(){
   pad1.clear(); pad2.clear();
   $('startBtn').textContent='▶ Start Match';
   $('winner').classList.add('hidden');
+  $('tugFlag').style.left='50%';
+  updateTug();
 }
+updateTug();
 </script>
 </body></html>
